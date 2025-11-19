@@ -1,0 +1,490 @@
+import React, { useState, useEffect } from 'react';
+import { Menu, X, ChevronDown, ExternalLink, Mail, Phone, MapPin, Download, PenTool, Ruler, Github, Linkedin, Instagram } from 'lucide-react';
+
+// 模拟数据
+const portfolioData = [
+    {
+        id: 1,
+        title: "云端美术馆",
+        category: "公共建筑",
+        image: "https://images.unsplash.com/photo-1516961642265-531546e84af2?q=80&w=1000&auto=format&fit=crop",
+        description: "位于山顶的现代艺术中心，利用自然光影与混凝土的极简对话。",
+        tags: ["Rhino", "V-Ray", "Sustainability"]
+    },
+    {
+        id: 2,
+        title: "森之私宅",
+        category: "住宅设计",
+        image: "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?q=80&w=1000&auto=format&fit=crop",
+        description: "与自然共生的独栋住宅，探索木材与玻璃的边界。",
+        tags: ["Revit", "Lumion", "Residential"]
+    },
+    {
+        id: 3,
+        title: "未来方舟",
+        category: "商业综合体",
+        image: "https://images.unsplash.com/photo-1486325212027-8081e485255e?q=80&w=1000&auto=format&fit=crop",
+        description: "集办公、休闲于一体的城市地标，强调垂直绿化系统。",
+        tags: ["Grasshopper", "Eco-design", "Urban"]
+    },
+    {
+        id: 4,
+        title: "旧厂房改造",
+        category: "城市更新",
+        image: "https://images.unsplash.com/photo-1558435186-d31d1366727e?q=80&w=1000&auto=format&fit=crop",
+        description: "保留工业遗迹的同时注入现代办公功能，新旧材质的碰撞。",
+        tags: ["Renovation", "Interior", "SketchUp"]
+    },
+    {
+        id: 5,
+        title: "极简书屋",
+        category: "室内设计",
+        image: "https://images.unsplash.com/photo-1505577058444-a3dab90d4253?q=80&w=1000&auto=format&fit=crop",
+        description: "以纯白为基调的阅读空间，利用漫反射光营造静谧氛围。",
+        tags: ["Interior", "Lighting", "Minimalism"]
+    },
+    {
+        id: 6,
+        title: "滨海剧院",
+        category: "公共建筑",
+        image: "https://images.unsplash.com/photo-1470723710355-95304d8aece4?q=80&w=1000&auto=format&fit=crop",
+        description: "流线型外立面呼应海浪形态，拥有世界级的声学设计。",
+        tags: ["Parametric", "Acoustics", "Culture"]
+    }
+];
+
+const experienceData = [
+    {
+        year: "2022 - 至今",
+        role: "高级建筑设计师",
+        company: "A+ 建筑事务所",
+        desc: "主导大型商业综合体项目的概念设计至扩初阶段，协调多专业团队协作，负责Parametric Design技术攻关。"
+    },
+    {
+        year: "2019 - 2022",
+        role: "建筑师",
+        company: "Urban Space 设计院",
+        desc: "参与多项公共文化建筑竞标并中标。专注于BIM全流程管理与绿色建筑性能分析。"
+    },
+    {
+        year: "2016 - 2019",
+        role: "助理建筑师",
+        company: "NEXT 创研中心",
+        desc: "协助主创设计师完成方案推敲，负责高精度物理模型制作及效果图渲染。"
+    }
+];
+
+const skills = [
+    { name: "Autodesk Revit / BIM", level: 95 },
+    { name: "Rhino + Grasshopper", level: 90 },
+    { name: "Adobe Creative Suite", level: 85 },
+    { name: "Lumion / Enscape / V-Ray", level: 90 },
+    { name: "AutoCAD", level: 95 },
+    { name: "SketchUp", level: 88 }
+        ];
+
+const App = () => {
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [activeFilter, setActiveFilter] = useState("全部");
+    const [scrolled, setScrolled] = useState(false);
+
+    // 滚动监听，用于导航栏样式变化
+    useEffect(() => {
+        const handleScroll = () => {
+            setScrolled(window.scrollY > 50);
+        };
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    // 提取所有不重复的分类
+    const categories = ["全部", ...new Set(portfolioData.map(item => item.category))];
+
+    // 过滤作品
+    const filteredPortfolio = activeFilter === "全部" 
+        ? portfolioData 
+        : portfolioData.filter(item => item.category === activeFilter);
+
+    const scrollToSection = (id) => {
+        setIsMenuOpen(false);
+        const element = document.getElementById(id);
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth' });
+        }
+    };
+
+    return (
+        <div className="min-h-screen bg-neutral-50 text-neutral-900 selection:bg-neutral-900 selection:text-white font-sans">
+            {/* Injected Styles for Fonts and Animations */}
+            <style>{`
+                @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap');
+                
+                body {
+                    font-family: 'Noto Sans SC', sans-serif;
+                }
+                
+                .font-serif {
+                    font-family: 'Playfair Display', serif;
+                }
+
+                .image-hover-zoom {
+                    overflow: hidden;
+                }
+                .image-hover-zoom img {
+                    transition: transform 0.7s ease;
+                }
+                .image-hover-zoom:hover img {
+                    transform: scale(1.05);
+                }
+                
+                .fade-in-up {
+                    animation: fadeInUp 0.8s ease-out forwards;
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+                
+                @keyframes fadeInUp {
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+            `}</style>
+
+            {/* Navigation */}
+            <nav className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white/90 backdrop-blur-md shadow-sm py-4' : 'bg-transparent py-6'}`}>
+                <div className="container mx-auto px-6 flex justify-between items-center">
+                    <div className="text-2xl font-bold font-serif tracking-tighter cursor-pointer" onClick={() => scrollToSection('home')}>
+                        L.ARCH
+                    </div>
+                    
+                    {/* Desktop Menu */}
+                    <div className="hidden md:flex space-x-12 text-sm font-medium tracking-wide">
+                        {['首页', '作品', '关于', '经历', '联系'].map((item, index) => {
+                            const ids = ['home', 'portfolio', 'about', 'experience', 'contact'];
+                            return (
+                                <button 
+                                    key={item}
+                                    onClick={() => scrollToSection(ids[index])}
+                                    className="hover:text-neutral-500 transition-colors uppercase"
+                                >
+                                    {item}
+                                </button>
+                            )
+                        })}
+                    </div>
+
+                    {/* Mobile Menu Button */}
+                    <button className="md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+                        {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                    </button>
+                </div>
+
+                {/* Mobile Menu Overlay */}
+                {isMenuOpen && (
+                    <div className="absolute top-full left-0 w-full bg-white shadow-lg py-8 flex flex-col items-center space-y-6 md:hidden border-t border-neutral-100">
+                        {['首页', '作品', '关于', '经历', '联系'].map((item, index) => {
+                            const ids = ['home', 'portfolio', 'about', 'experience', 'contact'];
+                            return (
+                                <button 
+                                    key={item}
+                                    onClick={() => scrollToSection(ids[index])}
+                                    className="text-lg font-medium"
+                                >
+                                    {item}
+                                </button>
+                            )
+                        })}
+                    </div>
+                )}
+            </nav>
+
+            {/* Hero Section */}
+            <section id="home" className="relative h-screen flex items-center justify-center overflow-hidden bg-neutral-900 text-white">
+                <div className="absolute inset-0 z-0">
+                    <img 
+                        src="https://images.unsplash.com/photo-1487958449943-2429e8be8625?q=80&w=2000&auto=format&fit=crop" 
+                        alt="Architecture Hero" 
+                        className="w-full h-full object-cover opacity-40"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-b from-transparent to-neutral-900/90"></div>
+                </div>
+                
+                <div className="container mx-auto px-6 relative z-10 text-center max-w-4xl fade-in-up">
+                    <p className="text-sm md:text-base tracking-[0.3em] uppercase mb-4 text-neutral-300">Architecture Portfolio</p>
+                    <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold font-serif mb-8 leading-tight">
+                        构建空间 <br/> <span className="text-neutral-400 italic">重塑生活</span>
+                    </h1>
+                    <p className="text-lg md:text-xl text-neutral-300 mb-12 font-light max-w-2xl mx-auto leading-relaxed">
+                        致力于探索功能与美学的平衡，用极简的设计语言回应复杂的城市问题。
+                        <br className="hidden md:block" />
+                        专注商业建筑、文化空间与高端住宅设计。
+                    </p>
+                    <button 
+                        onClick={() => scrollToSection('portfolio')}
+                        className="group bg-white text-neutral-900 px-8 py-4 text-sm font-bold tracking-widest uppercase hover:bg-neutral-200 transition-colors inline-flex items-center"
+                    >
+                        浏览作品
+                        <ChevronDown className="ml-2 group-hover:translate-y-1 transition-transform" size={16} />
+                    </button>
+                </div>
+            </section>
+
+            {/* Portfolio Section */}
+            <section id="portfolio" className="py-24 bg-white">
+                <div className="container mx-auto px-6">
+                    <div className="flex flex-col md:flex-row justify-between items-end mb-16">
+                        <div>
+                            <h2 className="text-4xl font-bold font-serif mb-4">精选作品</h2>
+                            <div className="h-1 w-20 bg-neutral-900"></div>
+                        </div>
+                        
+                        {/* Filter Buttons */}
+                        <div className="flex flex-wrap gap-4 mt-8 md:mt-0">
+                            {categories.map(cat => (
+                                <button
+                                    key={cat}
+                                    onClick={() => setActiveFilter(cat)}
+                                    className={`text-sm px-4 py-2 border transition-all ${
+                                        activeFilter === cat 
+                                        ? 'border-neutral-900 bg-neutral-900 text-white' 
+                                        : 'border-neutral-200 text-neutral-500 hover:border-neutral-900 hover:text-neutral-900'
+                                    }`}
+                                >
+                                    {cat}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Projects Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {filteredPortfolio.map(project => (
+                            <div key={project.id} className="group cursor-pointer fade-in-up">
+                                <div className="aspect-[4/3] bg-neutral-100 mb-4 overflow-hidden image-hover-zoom relative">
+                                    <img 
+                                        src={project.image} 
+                                        alt={project.title} 
+                                        className="w-full h-full object-cover"
+                                    />
+                                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-500 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                                        <div className="bg-white p-3 rounded-full shadow-lg">
+                                            <ExternalLink size={20} />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="flex justify-between items-start">
+                                    <div>
+                                        <h3 className="text-xl font-bold mb-1 font-serif group-hover:text-neutral-600 transition-colors">{project.title}</h3>
+                                        <p className="text-sm text-neutral-500 uppercase tracking-wider mb-2">{project.category}</p>
+                                    </div>
+                                </div>
+                                <p className="text-neutral-600 text-sm leading-relaxed mb-3">{project.description}</p>
+                                <div className="flex flex-wrap gap-2">
+                                    {project.tags.map(tag => (
+                                        <span key={tag} className="text-[10px] bg-neutral-100 text-neutral-500 px-2 py-1 rounded-full">
+                                            {tag}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* About & Skills Section */}
+            <section id="about" className="py-24 bg-neutral-50 border-t border-neutral-200">
+                <div className="container mx-auto px-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                        <div className="relative">
+                            <div className="aspect-[3/4] bg-neutral-200 w-full md:w-4/5 ml-auto relative z-10 overflow-hidden">
+                                    <img 
+                                    src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1000&auto=format&fit=crop" 
+                                    alt="Architect Portrait" 
+                                    className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
+                                />
+                            </div>
+                            <div className="absolute -bottom-6 -left-6 w-48 h-48 border-[1px] border-neutral-400 z-0 hidden md:block"></div>
+                            <div className="absolute -top-6 -right-6 w-32 h-32 bg-neutral-200 z-0 hidden md:block"></div>
+                        </div>
+
+                        <div>
+                            <h2 className="text-4xl font-bold font-serif mb-6">关于我</h2>
+                            <h3 className="text-xl text-neutral-500 mb-8 font-light italic">"建筑不仅是空间的容器，更是光与时间的艺术。"</h3>
+                            
+                            <p className="text-neutral-700 leading-loose mb-6">
+                                拥有 8 年专业建筑设计经验，专注于将可持续发展理念与当代美学相结合。我擅长使用参数化设计工具（Rhino/Grasshopper）来解决复杂的形态构建问题，同时也注重施工图的精确落地。
+                            </p>
+                            <p className="text-neutral-700 leading-loose mb-10">
+                                在我的职业生涯中，我参与了从大型城市综合体到私人定制住宅的各类项目。我相信每一个项目都有其独特的"场地精神"（Genius Loci），设计师的任务就是去发现并强化它。
+                            </p>
+
+                            <div className="grid grid-cols-2 gap-6 mb-10">
+                                <div>
+                                    <div className="flex items-center mb-2">
+                                        <PenTool size={18} className="mr-2 text-neutral-400"/>
+                                        <span className="font-bold text-sm uppercase">设计能力</span>
+                                    </div>
+                                    <p className="text-xs text-neutral-500">概念方案 / 扩初设计 / 效果图表现</p>
+                                </div>
+                                <div>
+                                    <div className="flex items-center mb-2">
+                                        <Ruler size={18} className="mr-2 text-neutral-400"/>
+                                        <span className="font-bold text-sm uppercase">技术专长</span>
+                                    </div>
+                                    <p className="text-xs text-neutral-500">BIM 协同 / 参数化建模 / 绿色建筑分析</p>
+                                </div>
+                            </div>
+
+                            {/* Skills Bars */}
+                            <div className="space-y-4">
+                                {skills.map(skill => (
+                                    <div key={skill.name}>
+                                        <div className="flex justify-between mb-1">
+                                            <span className="text-xs font-bold tracking-wider text-neutral-600">{skill.name}</span>
+                                            <span className="text-xs text-neutral-400">{skill.level}%</span>
+                                        </div>
+                                        <div className="h-1 w-full bg-neutral-200">
+                                            <div 
+                                                className="h-1 bg-neutral-800" 
+                                                style={{width: `${skill.level}%`}}
+                                            ></div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Experience Timeline */}
+            <section id="experience" className="py-24 bg-white">
+                <div className="container mx-auto px-6 max-w-4xl">
+                        <div className="text-center mb-16">
+                        <h2 className="text-4xl font-bold font-serif mb-4">职业经历</h2>
+                        <p className="text-neutral-500">Professional Journey</p>
+                    </div>
+                    
+                    <div className="space-y-12 relative border-l border-neutral-200 ml-3 md:ml-0 md:pl-0">
+                        {experienceData.map((exp, index) => (
+                            <div key={index} className="relative md:grid md:grid-cols-5 gap-8 items-start pl-8 md:pl-0">
+                                {/* Dot */}
+                                <div className="absolute -left-[5px] top-2 w-2.5 h-2.5 rounded-full bg-neutral-900 md:hidden"></div>
+                                
+                                <div className="md:col-span-1 md:text-right">
+                                    <span className="text-sm font-bold text-neutral-400 tracking-wider">{exp.year}</span>
+                                </div>
+                                
+                                {/* Desktop Center Line Dot */}
+                                <div className="hidden md:flex md:col-span-1 justify-center relative">
+                                    <div className="h-full w-px bg-neutral-200 absolute top-0 left-1/2 -translate-x-1/2 -z-10"></div>
+                                    <div className="w-3 h-3 rounded-full bg-neutral-900 mt-2 z-10 ring-4 ring-white"></div>
+                                </div>
+
+                                <div className="md:col-span-3 bg-neutral-50 p-6 rounded-sm hover:shadow-md transition-shadow">
+                                    <h3 className="text-lg font-bold font-serif">{exp.role}</h3>
+                                    <h4 className="text-md text-neutral-500 mb-3">{exp.company}</h4>
+                                    <p className="text-sm text-neutral-600 leading-relaxed">{exp.desc}</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    <div className="mt-16 text-center">
+                        <button className="border border-neutral-900 text-neutral-900 px-8 py-3 text-sm font-bold tracking-widest uppercase hover:bg-neutral-900 hover:text-white transition-colors inline-flex items-center">
+                            <Download className="mr-2" size={18} />
+                            下载完整简历 (PDF)
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            {/* Contact Section */}
+            <section id="contact" className="py-24 bg-neutral-900 text-white">
+                <div className="container mx-auto px-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+                        <div>
+                            <h2 className="text-4xl font-bold font-serif mb-6">联系合作</h2>
+                            <p className="text-neutral-400 mb-10 leading-relaxed text-lg font-light">
+                                正在寻找新的职业机会与设计挑战。<br/>
+                                如果您有项目合作意向，或想讨论建筑与设计，欢迎随时联系。
+                            </p>
+                            
+                            <div className="space-y-6">
+                                <div className="flex items-center group">
+                                    <div className="w-12 h-12 bg-neutral-800 rounded-full flex items-center justify-center mr-4 group-hover:bg-neutral-700 transition-colors">
+                                        <Mail size={20} />
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-neutral-500 uppercase tracking-wider">Email</p>
+                                        <p className="text-lg">contact@architect-li.com</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center group">
+                                    <div className="w-12 h-12 bg-neutral-800 rounded-full flex items-center justify-center mr-4 group-hover:bg-neutral-700 transition-colors">
+                                        <Phone size={20} />
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-neutral-500 uppercase tracking-wider">Phone</p>
+                                        <p className="text-lg">+86 138 0000 0000</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center group">
+                                    <div className="w-12 h-12 bg-neutral-800 rounded-full flex items-center justify-center mr-4 group-hover:bg-neutral-700 transition-colors">
+                                        <MapPin size={20} />
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-neutral-500 uppercase tracking-wider">Location</p>
+                                        <p className="text-lg">上海 / 杭州 / 远程</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="flex gap-4 mt-12">
+                                <a href="#" className="p-3 bg-neutral-800 rounded-full hover:bg-white hover:text-neutral-900 transition-all"><Github size={20}/></a>
+                                <a href="#" className="p-3 bg-neutral-800 rounded-full hover:bg-white hover:text-neutral-900 transition-all"><Linkedin size={20}/></a>
+                                <a href="#" className="p-3 bg-neutral-800 rounded-full hover:bg-white hover:text-neutral-900 transition-all"><Instagram size={20}/></a>
+                            </div>
+                        </div>
+
+                        {/* Contact Form */}
+                        <div className="bg-white text-neutral-900 p-8 md:p-12">
+                            <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
+                                <div>
+                                    <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-neutral-500">姓名</label>
+                                    <input type="text" className="w-full border-b border-neutral-300 py-3 focus:outline-none focus:border-neutral-900 transition-colors bg-transparent" placeholder="您的称呼" />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-neutral-500">邮箱</label>
+                                    <input type="email" className="w-full border-b border-neutral-300 py-3 focus:outline-none focus:border-neutral-900 transition-colors bg-transparent" placeholder="name@example.com" />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-neutral-500">留言内容</label>
+                                    <textarea rows="4" className="w-full border-b border-neutral-300 py-3 focus:outline-none focus:border-neutral-900 transition-colors bg-transparent resize-none" placeholder="请描述您的项目需求..."></textarea>
+                                </div>
+                                <button className="w-full bg-neutral-900 text-white py-4 text-sm font-bold tracking-widest uppercase hover:bg-neutral-700 transition-colors mt-4">
+                                    发送消息
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Footer */}
+            <footer className="bg-neutral-950 text-neutral-500 py-8 border-t border-neutral-900">
+                <div className="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center text-xs">
+                    <p>&copy; 2025 Li Architecture Studio. All rights reserved.</p>
+                    <div className="flex space-x-6 mt-4 md:mt-0">
+                        <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
+                        <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    );
+};
+
+export default App;
